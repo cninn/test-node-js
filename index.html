@@ -1,0 +1,213 @@
+Merhaba, bu Bing. Size yardımcı olmaktan memnunum. 😊
+
+HTML, CSS ve JavaScript kullanarak bir todo app tasarlamak istiyorsanız, size bir örnek kod verebilirim. Bu kod, kullanıcıların yapılacaklar listesi oluşturmasına, düzenlemesine ve silmesine izin veren basit bir web uygulamasıdır. Kodu aşağıdaki gibi bir kod bloğunda görebilirsiniz.
+
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+    <style>
+        /* CSS kodu buraya yazılır */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            background-color: #3f51b5;
+            padding: 20px;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        li.done {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            width: 80%;
+        }
+
+        button {
+            border: none;
+            background-color: transparent;
+            color: #3f51b5;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            color: #ff4081;
+        }
+
+        .add {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Todo App</h1>
+    <ul id="todo-list">
+        <!-- Yapılacaklar listesi buraya gelir -->
+    </ul>
+    <div class="add">
+        <input type="text" id="todo-input" placeholder="Yeni bir şey ekle...">
+        <button id="todo-button">+</button>
+    </div>
+    <script>
+        // JavaScript kodu buraya yazılır
+        // HTML elemanlarını seçiyoruz
+        const todoList = document.getElementById("todo-list");
+        const todoInput = document.getElementById("todo-input");
+        const todoButton = document.getElementById("todo-button");
+
+        // Yapılacaklar listesini bir dizi olarak tutuyoruz
+        let todos = [];
+
+        // Yapılacaklar listesini yerel depolamadan alıyoruz
+        function getTodos() {
+            // Yerel depolamada todos adında bir veri varsa onu alıyoruz
+            // Yoksa boş bir dizi atıyoruz
+            todos = localStorage.getItem("todos") ? JSON.parse(localStorage.getItem("todos")) : [];
+            // Yapılacaklar listesini güncelliyoruz
+            updateTodos();
+        }
+
+        // Yapılacaklar listesini yerel depolamaya kaydediyoruz
+        function saveTodos() {
+            // Yerel depolamaya todos adıyla dizi olarak kaydediyoruz
+            localStorage.setItem("todos", JSON.stringify(todos));
+        }
+
+        // Yapılacaklar listesini güncelliyoruz
+        function updateTodos() {
+            // Yapılacaklar listesini temizliyoruz
+            todoList.innerHTML = "";
+            // Dizideki her bir yapılacak için bir HTML elemanı oluşturuyoruz
+            todos.forEach((todo, index) => {
+                // Bir li elemanı oluşturuyoruz
+                const li = document.createElement("li");
+                // Yapılacak tamamlanmışsa li elemanına done sınıfını ekliyoruz
+                if (todo.completed) {
+                    li.classList.add("done");
+                }
+                // Li elemanının içeriğini dolduruyoruz
+                li.innerHTML = `
+                    <input type="checkbox" ${todo.completed ? "checked" : ""}>
+                    <input type="text" value="${todo.text}">
+                    <button data-index="${index}">x</button>
+                `;
+                // Li elemanını yapılacaklar listesine ekliyoruz
+                todoList.appendChild(li);
+            });
+        }
+
+        // Yeni bir yapılacak ekliyoruz
+        function addTodo() {
+            // Giriş kutusundaki değeri alıyoruz
+            const todoText = todoInput.value.trim();
+            // Eğer değer boş değilse
+            if (todoText) {
+                // Yeni bir yapılacak objesi oluşturuyoruz
+                const todo = {
+                    text: todoText,
+                    completed: false
+                };
+                // Yapılacak objesini dizimize ekliyoruz
+                todos.push(todo);
+                // Yapılacaklar listesini güncelliyoruz
+                updateTodos();
+                // Yapılacaklar listesini yerel depolamaya kaydediyoruz
+                saveTodos();
+                // Giriş kutusunu temizliyoruz
+                todoInput.value = "";
+            }
+        }
+
+        // Bir yapılacağı tamamlıyoruz veya tamamlanmamış yapıyoruz
+        function toggleTodoCompleted(event) {
+            // Eğer tıklanan eleman bir onay kutusu ise
+            if (event.target.type === "checkbox") {
+                // Onay kutusunun bulunduğu li elemanını seçiyoruz
+                const li = event.target.parentElement;
+                // Li elemanının sınıfını değiştiriyoruz
+                li.classList.toggle("done");
+                // Li elemanının index değerini alıyoruz
+                const index = Array.from(todoList.children).indexOf(li);
+                // Dizideki yapılacak objesinin tamamlanma durumunu değiştiriyoruz
+                todos[index].completed = !todos[index].completed;
+                // Yapılacaklar listesini yerel depolamaya kaydediyoruz
+                saveTodos();
+            }
+        }
+
+        // Bir yapılacağı düzenliyoruz
+        function editTodoText(event) {
+            // Eğer tıklanan eleman bir giriş kutusu ise
+            if (event.target.type === "text") {
+                // Giriş kutusunun bulunduğu li elemanını seçiyoruz
+                const li = event.target.parentElement;
+                // Li elemanının index değerini alıyoruz
+                const index = Array.from(todoList.children).indexOf(li);
+                // Dizideki yapılacak objesinin metnini güncelliyoruz
+                todos[index].text = event.target.value;
+                // Yapılacaklar listesini yerel depolamaya kaydediyoruz
+                saveTodos();
+            }
+        }
+
+        // Bir yapılacağı siliyoruz
+        function deleteTodo(event) {
+            // Eğer tıklanan eleman bir buton ise
+            if (event.target.tagName === "BUTTON") {
+                // Butonun bulunduğu li elemanını seçiyoruz
+                const li = event.target.parentElement;
+                // Li elemanının index değerini alıyoruz
+                const index = event.target.dataset.index;
+                // Diziden yapılacak objesini siliyoruz
+                todos.splice(index, 1);
+                // Yapılacaklar listesini güncelliyoruz
+                updateTodos();
+                // Yapılacaklar listesini yerel depolamaya kaydediyoruz
+                saveTodos();
+            }
+        }
+
+        // Sayfa yüklendiğinde yapılacaklar listesini alıyoruz
+        window.addEventListener("load", getTodos);
+        // Ekle butonuna tıklandığında yeni bir yapılacak ekliyoruz
+        todoButton.addEventListener("click", addTodo);
+        // Yapılacaklar listesindeki herhangi bir elemana tıklandığında ilgili fonksiyonu çağırıyoruz
+        todoList.addEventListener("click", toggleTodoCompleted);
+        todoList.addEventListener("input", editTodoText);
+        todoList.addEventListener("click", deleteTodo);
+    </script>
+</body>
+</html>

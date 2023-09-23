@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "click_events": "^1.0.3"
+  },
+  "repository": {
+    "type":"git",
+    "url":"https://github.com/cninn/test-node-js.git"
+  }
+}
